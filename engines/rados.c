@@ -32,6 +32,7 @@ struct rados_options {
 	char *pool_name;
 	char *client_name;
 	int busy_poll;
+	int cleanup;
 };
 
 static struct fio_option options[] = {
@@ -69,6 +70,16 @@ static struct fio_option options[] = {
 		.help     = "Busy poll for completions instead of sleeping",
 		.off1     = offsetof(struct rados_options, busy_poll),
 		.def	  = "0",
+		.category = FIO_OPT_C_ENGINE,
+		.group    = FIO_OPT_G_RBD,
+	},
+	{
+		.name     = "cleanup",
+		.lname    = "object cleanup",
+		.type     = FIO_OPT_BOOL,
+		.help     = "Clean up rados objects after creation",
+		.off1     = offsetof(struct rados_options, cleanup),
+		.def      = "1",
 		.category = FIO_OPT_C_ENGINE,
 		.group    = FIO_OPT_G_RBD,
 	},
@@ -220,8 +231,10 @@ static void _fio_rados_disconnect(struct rados_data *rados)
 static void fio_rados_cleanup(struct thread_data *td)
 {
 	struct rados_data *rados = td->io_ops_data;
+	struct rados_options *o = td->eo;
+	int cleanup = o->cleanup;
 
-	if (rados) {
+	if (rados && cleanup) {
 		_fio_rados_rm_objects(td, rados);
 		_fio_rados_disconnect(rados);
 		free(rados->aio_events);

@@ -1900,6 +1900,9 @@ by default.
 Poll store instead of waiting for completion. Usually this provides better
 throughput at cost of higher(up to 100%) CPU utilization.
 .TP
+.BI (rbd,rados)cleanup \fR=\fPbool
+Clean up rados objects after run. Defaults to true.
+.TP
 .BI (http)http_host \fR=\fPstr
 Hostname to connect to. For S3, this could be the bucket name. Default
 is \fBlocalhost\fR
